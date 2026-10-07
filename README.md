@@ -290,19 +290,3 @@ The runners preserve engine decisions, diagnostics, changed Java files,
 post-refactoring compilation results, and observable execution behavior.
 Differences in these records are suspicious cases that require validation;
 they are not automatically classified as bugs.
-
-## Reproducibility Notes
-
-- Do not compare outputs produced from different corpus snapshots without
-  recording that distinction.
-- Record the corpus version, IDE source revisions, IDE binary versions, JDK
-  version, model identifiers, endpoint, temperatures, and command lines.
-- Use the same `test_cases.json` for every IDE and separate runner workspaces.
-- Do not interpret runner failures, unsupported operations, or timeouts as IDE
-  precondition decisions.
-- API keys, local source repositories, IDE installations, generated outputs,
-  and caches must not be committed.
-
-## License and Citation
-
-License and citation metadata will be added before the public release.
