@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Bug list for refactoring engine testing across IntelliJ IDEA, Eclipse IDE, and VS Code Java.">
+  <title>PreDiff Bug List</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f6f8fa;
+      --surface-2: #fbfcfd;
+      --border: #d0d7de;
+      --border-soft: #eaeef2;
+      --text: #1f2328;
+      --muted: #656d76;
+      --link: #0969da;
+      --accent: #24292f;
+      --open-bg: #fff8c5;
+      --open-fg: #7d4e00;
+      --fixed-bg: #dafbe1;
+      --fixed-fg: #116329;
+      --confirmed-bg: #ddf4ff;
+      --confirmed-fg: #0969da;
+      --unknown-bg: #f6f8fa;
+      --unknown-fg: #6e7781;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    .page {
+      width: min(1500px, calc(100% - 32px));
+      margin: 42px auto 60px;
+    }
+
+    .header {
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .stat {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      background: var(--surface-2);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 25px;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) 220px 190px;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-bottom: 0;
+      border-radius: 10px 10px 0 0;
+      background: var(--surface);
+    }
+
+    .control {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      outline: none;
+    }
+
+    .control:focus {
+      border-color: #0969da;
+      box-shadow: 0 0 0 3px rgba(9, 105, 218, .12);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 0 0 10px 10px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-right: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+      text-align: center;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    th:last-child, td:last-child {
+      border-right: 0;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #f6f8fa;
+      font-weight: 600;
+    }
+
+    thead tr:first-child th {
+      background: #eef1f4;
+      color: #24292f;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr:hover {
+      background: #f6f8fa;
+    }
+
+    td.num {
+      width: 64px;
+      color: var(--muted);
+    }
+
+    td.refactoring {
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .bug-link {
+      color: var(--link);
+      text-decoration: none;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .bug-link:hover {
+      text-decoration: underline;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 72px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+
+    .status-open {
+      background: var(--open-bg);
+      color: var(--open-fg);
+      border-color: #d4a72c66;
+    }
+
+    .status-fixed {
+      background: var(--fixed-bg);
+      color: var(--fixed-fg);
+      border-color: #2da44e55;
+    }
+
+    .status-confirmed {
+      background: var(--confirmed-bg);
+      color: var(--confirmed-fg);
+      border-color: #54aeff66;
+    }
+
+    .status-unknown {
+      background: var(--unknown-bg);
+      color: var(--unknown-fg);
+      border-color: var(--border-soft);
+    }
+
+    .footer-note {
+      margin: 14px 2px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    #result-count {
+      margin-left: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 800px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+      .page {
+        width: min(100% - 20px, 1500px);
+        margin-top: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <h1>PreDiff Bug List</h1>
+      <p class="subtitle">
+        Refactoring-engine bugs identified across IntelliJ IDEA 2026.1,
+        Eclipse IDE 2026-03, and VS Code Java.
+      </p>
+    </header>
+
+    <section class="stats" aria-label="Bug statistics">
+      <div class="stat"><strong>61</strong><span>Submitted issues</span></div>
+      <div class="stat"><strong>39</strong><span>IntelliJ IDEA issues</span></div>
+      <div class="stat"><strong>19</strong><span>Eclipse IDE issues</span></div>
+      <div class="stat"><strong>3</strong><span>VS Code Java issues</span></div>
+    </section>
+
+    <section>
+      <div class="toolbar">
+        <input id="search" class="control" type="search"
+               placeholder="Search bug ID, refactoring, or status..."
+               aria-label="Search table">
+
+        <select id="refactoring-filter" class="control" aria-label="Filter by refactoring">
+          <option value="">All refactorings</option>
+          <option value="InlineMethod">InlineMethod</option>
+<option value="MoveInstanceMethod">MoveInstanceMethod</option>
+<option value="ExtractVariable">ExtractVariable</option>
+<option value="ExtractMethod">ExtractMethod</option>
+<option value="Rename Method">Rename Method</option>
+<option value="Rename Field">Rename Field</option>
+<option value="Rename Variable">Rename Variable</option>
+        </select>
+
+        <select id="status-filter" class="control" aria-label="Filter by status">
+          <option value="">All statuses</option>
+          <option value="open">Open</option>
+          <option value="fixed">Fixed</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="unknown">No status</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table id="bug-table">
+          <thead>
+            <tr>
+              <th rowspan="2">Bug List</th>
+              <th rowspan="2">Refactoring Type</th>
+              <th colspan="2">IntelliJ IDEA 2026.1</th>
+              <th colspan="2">Eclipse IDE 2026-03</th>
+              <th colspan="2">VS Code Java</th>
+            </tr>
+            <tr>
+              <th>Bug ID</th>
+              <th>Status</th>
+              <th>Bug ID</th>
+              <th>Status</th>
+              <th>Bug ID</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="1 inlinemethod 389879 open   4425 confirmed"
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="confirmed">
+        <td class="num">1</td>
+        <td class="refactoring">InlineMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-389879" target="_blank" rel="noopener noreferrer">IDEA-389879</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/redhat-developer/vscode-java/issues/4425" target="_blank" rel="noopener noreferrer">#4425</a></td>
+        <td><span class="status status-confirmed">Confirmed</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="2 inlinemethod 391659 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">2</td>
+        <td class="refactoring">InlineMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-391659" target="_blank" rel="noopener noreferrer">IDEA-391659</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="3 inlinemethod 391668 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">3</td>
+        <td class="refactoring">InlineMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-391668" target="_blank" rel="noopener noreferrer">IDEA-391668</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="4 inlinemethod 391918 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">4</td>
+        <td class="refactoring">InlineMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-391918" target="_blank" rel="noopener noreferrer">IDEA-391918</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="5 inlinemethod 391920 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">5</td>
+        <td class="refactoring">InlineMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-391920" target="_blank" rel="noopener noreferrer">IDEA-391920</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="6 inlinemethod 393848 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">6</td>
+        <td class="refactoring">InlineMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393848" target="_blank" rel="noopener noreferrer">IDEA-393848</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="7 inlinemethod   3007 fixed  "
+        data-idea-status=""
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">7</td>
+        <td class="refactoring">InlineMethod</td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3007" target="_blank" rel="noopener noreferrer">#3007</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="8 inlinemethod   3008 fixed  "
+        data-idea-status=""
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">8</td>
+        <td class="refactoring">InlineMethod</td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3008" target="_blank" rel="noopener noreferrer">#3008</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="9 inlinemethod   3018 fixed  "
+        data-idea-status=""
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">9</td>
+        <td class="refactoring">InlineMethod</td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3018" target="_blank" rel="noopener noreferrer">#3018</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="10 inlinemethod   3019 fixed  "
+        data-idea-status=""
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">10</td>
+        <td class="refactoring">InlineMethod</td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3019" target="_blank" rel="noopener noreferrer">#3019</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="11 inlinemethod   3021 fixed  "
+        data-idea-status=""
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">11</td>
+        <td class="refactoring">InlineMethod</td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3021" target="_blank" rel="noopener noreferrer">#3021</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="12 inlinemethod   3069 fixed 4464 "
+        data-idea-status=""
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">12</td>
+        <td class="refactoring">InlineMethod</td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3069" target="_blank" rel="noopener noreferrer">#3069</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td><a class="bug-link" href="https://github.com/redhat-developer/vscode-java/issues/4464" target="_blank" rel="noopener noreferrer">#4464</a></td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="InlineMethod"
+        data-search="13 inlinemethod   3070 fixed  "
+        data-idea-status=""
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">13</td>
+        <td class="refactoring">InlineMethod</td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3070" target="_blank" rel="noopener noreferrer">#3070</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="MoveInstanceMethod"
+        data-search="14 moveinstancemethod 390591 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">14</td>
+        <td class="refactoring">MoveInstanceMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-390591" target="_blank" rel="noopener noreferrer">IDEA-390591</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="MoveInstanceMethod"
+        data-search="15 moveinstancemethod 390620 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">15</td>
+        <td class="refactoring">MoveInstanceMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-390620" target="_blank" rel="noopener noreferrer">IDEA-390620</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="MoveInstanceMethod"
+        data-search="16 moveinstancemethod 390908 open 3035 fixed 4460 fixed"
+        data-idea-status="open"
+        data-eclipse-status="fixed"
+        data-vscode-status="fixed">
+        <td class="num">16</td>
+        <td class="refactoring">MoveInstanceMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-390908" target="_blank" rel="noopener noreferrer">IDEA-390908</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3035" target="_blank" rel="noopener noreferrer">#3035</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td><a class="bug-link" href="https://github.com/redhat-developer/vscode-java/issues/4460" target="_blank" rel="noopener noreferrer">#4460</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+      </tr>
+      <tr
+        data-refactoring="MoveInstanceMethod"
+        data-search="17 moveinstancemethod 392964 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">17</td>
+        <td class="refactoring">MoveInstanceMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-392964" target="_blank" rel="noopener noreferrer">IDEA-392964</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="MoveInstanceMethod"
+        data-search="18 moveinstancemethod 392966 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">18</td>
+        <td class="refactoring">MoveInstanceMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-392966" target="_blank" rel="noopener noreferrer">IDEA-392966</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="MoveInstanceMethod"
+        data-search="19 moveinstancemethod 392975 open 3124 fixed  "
+        data-idea-status="open"
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">19</td>
+        <td class="refactoring">MoveInstanceMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-392975" target="_blank" rel="noopener noreferrer">IDEA-392975</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3124" target="_blank" rel="noopener noreferrer">#3124</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="MoveInstanceMethod"
+        data-search="20 moveinstancemethod 392979 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">20</td>
+        <td class="refactoring">MoveInstanceMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-392979" target="_blank" rel="noopener noreferrer">IDEA-392979</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="MoveInstanceMethod"
+        data-search="21 moveinstancemethod 393021 open 3129   "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">21</td>
+        <td class="refactoring">MoveInstanceMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393021" target="_blank" rel="noopener noreferrer">IDEA-393021</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3129" target="_blank" rel="noopener noreferrer">#3129</a></td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="MoveInstanceMethod"
+        data-search="22 moveinstancemethod 393238 open 3123 fixed  "
+        data-idea-status="open"
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">22</td>
+        <td class="refactoring">MoveInstanceMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393238" target="_blank" rel="noopener noreferrer">IDEA-393238</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3123" target="_blank" rel="noopener noreferrer">#3123</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractVariable"
+        data-search="23 extractvariable   3098 fixed  "
+        data-idea-status=""
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">23</td>
+        <td class="refactoring">ExtractVariable</td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3098" target="_blank" rel="noopener noreferrer">#3098</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractVariable"
+        data-search="24 extractvariable   3182   "
+        data-idea-status=""
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">24</td>
+        <td class="refactoring">ExtractVariable</td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3182" target="_blank" rel="noopener noreferrer">#3182</a></td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractVariable"
+        data-search="25 extractvariable 392256 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">25</td>
+        <td class="refactoring">ExtractVariable</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-392256" target="_blank" rel="noopener noreferrer">IDEA-392256</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractVariable"
+        data-search="26 extractvariable 392258 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">26</td>
+        <td class="refactoring">ExtractVariable</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-392258" target="_blank" rel="noopener noreferrer">IDEA-392258</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractVariable"
+        data-search="27 extractvariable 392259 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">27</td>
+        <td class="refactoring">ExtractVariable</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-392259" target="_blank" rel="noopener noreferrer">IDEA-392259</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractVariable"
+        data-search="28 extractvariable 392692 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">28</td>
+        <td class="refactoring">ExtractVariable</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-392692" target="_blank" rel="noopener noreferrer">IDEA-392692</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractVariable"
+        data-search="29 extractvariable 393418 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">29</td>
+        <td class="refactoring">ExtractVariable</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393418" target="_blank" rel="noopener noreferrer">IDEA-393418</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractVariable"
+        data-search="30 extractvariable 393419 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">30</td>
+        <td class="refactoring">ExtractVariable</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393419" target="_blank" rel="noopener noreferrer">IDEA-393419</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractVariable"
+        data-search="31 extractvariable 393420 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">31</td>
+        <td class="refactoring">ExtractVariable</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393420" target="_blank" rel="noopener noreferrer">IDEA-393420</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractVariable"
+        data-search="32 extractvariable 393424 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">32</td>
+        <td class="refactoring">ExtractVariable</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393424" target="_blank" rel="noopener noreferrer">IDEA-393424</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractVariable"
+        data-search="33 extractvariable 393427 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">33</td>
+        <td class="refactoring">ExtractVariable</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393427" target="_blank" rel="noopener noreferrer">IDEA-393427</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractMethod"
+        data-search="34 extractmethod 393950 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">34</td>
+        <td class="refactoring">ExtractMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393950" target="_blank" rel="noopener noreferrer">IDEA-393950</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractMethod"
+        data-search="35 extractmethod 393951 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">35</td>
+        <td class="refactoring">ExtractMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393951" target="_blank" rel="noopener noreferrer">IDEA-393951</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractMethod"
+        data-search="36 extractmethod 394077 open 3223 fixed  "
+        data-idea-status="open"
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">36</td>
+        <td class="refactoring">ExtractMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-394077" target="_blank" rel="noopener noreferrer">IDEA-394077</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3223" target="_blank" rel="noopener noreferrer">#3223</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractMethod"
+        data-search="37 extractmethod 394100 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">37</td>
+        <td class="refactoring">ExtractMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-394100" target="_blank" rel="noopener noreferrer">IDEA-394100</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractMethod"
+        data-search="38 extractmethod 394210 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">38</td>
+        <td class="refactoring">ExtractMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-394210" target="_blank" rel="noopener noreferrer">IDEA-394210</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractMethod"
+        data-search="39 extractmethod 394211 open 3234 fixed  "
+        data-idea-status="open"
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">39</td>
+        <td class="refactoring">ExtractMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-394211" target="_blank" rel="noopener noreferrer">IDEA-394211</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3234" target="_blank" rel="noopener noreferrer">#3234</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractMethod"
+        data-search="40 extractmethod 394212 open 3235 fixed  "
+        data-idea-status="open"
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">40</td>
+        <td class="refactoring">ExtractMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-394212" target="_blank" rel="noopener noreferrer">IDEA-394212</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3235" target="_blank" rel="noopener noreferrer">#3235</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractMethod"
+        data-search="41 extractmethod 394213 open 3236   "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">41</td>
+        <td class="refactoring">ExtractMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-394213" target="_blank" rel="noopener noreferrer">IDEA-394213</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3236" target="_blank" rel="noopener noreferrer">#3236</a></td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="ExtractMethod"
+        data-search="42 extractmethod 394214 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">42</td>
+        <td class="refactoring">ExtractMethod</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-394214" target="_blank" rel="noopener noreferrer">IDEA-394214</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="Rename Method"
+        data-search="43 rename method   3034 fixed  "
+        data-idea-status=""
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">43</td>
+        <td class="refactoring">Rename Method</td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3034" target="_blank" rel="noopener noreferrer">#3034</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="Rename Method"
+        data-search="44 rename method 393465 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">44</td>
+        <td class="refactoring">Rename Method</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393465" target="_blank" rel="noopener noreferrer">IDEA-393465</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="Rename Method"
+        data-search="45 rename method 393490 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">45</td>
+        <td class="refactoring">Rename Method</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393490" target="_blank" rel="noopener noreferrer">IDEA-393490</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="Rename Method"
+        data-search="46 rename method 393491 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">46</td>
+        <td class="refactoring">Rename Method</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393491" target="_blank" rel="noopener noreferrer">IDEA-393491</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="Rename Method"
+        data-search="47 rename method 393492 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">47</td>
+        <td class="refactoring">Rename Method</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393492" target="_blank" rel="noopener noreferrer">IDEA-393492</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="Rename Method"
+        data-search="48 rename method 394201 open    "
+        data-idea-status="open"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">48</td>
+        <td class="refactoring">Rename Method</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-394201" target="_blank" rel="noopener noreferrer">IDEA-394201</a></td>
+        <td><span class="status status-open">Open</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="Rename Field"
+        data-search="49 rename field   3141 fixed  "
+        data-idea-status=""
+        data-eclipse-status="fixed"
+        data-vscode-status="">
+        <td class="num">49</td>
+        <td class="refactoring">Rename Field</td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td><a class="bug-link" href="https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/3141" target="_blank" rel="noopener noreferrer">#3141</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+      <tr
+        data-refactoring="Rename Variable"
+        data-search="50 rename variable 393830 fixed    "
+        data-idea-status="fixed"
+        data-eclipse-status=""
+        data-vscode-status="">
+        <td class="num">50</td>
+        <td class="refactoring">Rename Variable</td>
+        <td><a class="bug-link" href="https://youtrack.jetbrains.com/issue/IDEA-393830" target="_blank" rel="noopener noreferrer">IDEA-393830</a></td>
+        <td><span class="status status-fixed">Fixed</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+        <td>—</td>
+        <td><span class="status status-unknown">—</span></td>
+      </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="footer-note">
+        Showing <strong id="result-count">50</strong> of 50 table rows.
+        Bug IDs link to the corresponding public issue tracker.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const rows = Array.from(document.querySelectorAll("#bug-table tbody tr"));
+    const search = document.getElementById("search");
+    const refactoringFilter = document.getElementById("refactoring-filter");
+    const statusFilter = document.getElementById("status-filter");
+    const resultCount = document.getElementById("result-count");
+
+    function rowHasStatus(row, wanted) {
+      const statuses = [
+        row.dataset.ideaStatus,
+        row.dataset.eclipseStatus,
+        row.dataset.vscodeStatus
+      ];
+
+      if (wanted === "unknown") {
+        // "No status" applies if the row contains at least one issue whose status cell is empty.
+        const cells = row.querySelectorAll("td");
+        const ideaHasIssue = cells[2].textContent.trim() !== "—";
+        const eclipseHasIssue = cells[4].textContent.trim() !== "—";
+        const vscodeHasIssue = cells[6].textContent.trim() !== "—";
+        return (ideaHasIssue && !row.dataset.ideaStatus) ||
+               (eclipseHasIssue && !row.dataset.eclipseStatus) ||
+               (vscodeHasIssue && !row.dataset.vscodeStatus);
+      }
+
+      return statuses.includes(wanted);
+    }
+
+    function applyFilters() {
+      const q = search.value.trim().toLowerCase();
+      const refactoring = refactoringFilter.value;
+      const status = statusFilter.value;
+
+      let visible = 0;
+
+      rows.forEach(row => {
+        const matchesSearch = !q || row.dataset.search.includes(q);
+        const matchesRefactoring = !refactoring || row.dataset.refactoring === refactoring;
+        const matchesStatus = !status || rowHasStatus(row, status);
+
+        const show = matchesSearch && matchesRefactoring && matchesStatus;
+        row.classList.toggle("hidden", !show);
+        if (show) visible++;
+      });
+
+      resultCount.textContent = visible;
+    }
+
+    search.addEventListener("input", applyFilters);
+    refactoringFilter.addEventListener("change", applyFilters);
+    statusFilter.addEventListener("change", applyFilters);
+  </script>
+</body>
+</html>
