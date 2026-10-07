@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+OpenIDE-Module: experiment.netbeans.refactoring.backend
+OpenIDE-Module-Name: Refactoring Test NetBeans Backend
+OpenIDE-Module-Specification-Version: 1.0
+OpenIDE-Module-Install: experiment/netbeans/runner/NetBeansRefactoringModule.class
+OpenIDE-Module-Module-Dependencies: org.openide.modules,
+ org.openide.util.lookup,
+ org.openide.util,
+ org.openide.filesystems,
+ org.openide.awt,
+ org.openide.loaders,
+ org.openide.nodes,
+ org.netbeans.libs.javacapi,
+ org.netbeans.modules.projectapi/1,
+ org.netbeans.modules.projectuiapi.base/1,
+ org.netbeans.modules.java.j2seproject/1,
+ org.netbeans.modules.java.source.base,
+ org.netbeans.modules.java.source,
+ org.netbeans.modules.java.hints/1 = 17,
+ org.netbeans.modules.parsing.api/1,
+ org.netbeans.spi.editor.hints/0-1,
+ org.netbeans.modules.refactoring.api,
+ org.netbeans.modules.refactoring.java/1
+OpenIDE-Module-Requires: org.openide.modules.ModuleFormat1

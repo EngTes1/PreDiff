@@ -1,0 +1,5 @@
+# Runtime dependency tested with the packaged implementation.
+langchain-openai==1.1.8
+
+# Optional Kotlin AST support is documented in README.md because it is not
+# required for the Java-only main experiment.

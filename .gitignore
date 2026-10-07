@@ -1,0 +1,68 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Local virtual environments
+my_agent_env/
+.venv/
+venv/
+env/
+
+# Generated caches and helper builds
+.cache/
+.ast_helper_build/
+.pytest_cache/
+.mypy_cache/
+
+# IDE/local metadata
+.idea/
+.vscode/
+
+# Logs and crash dumps
+*.log
+hs_err_pid*.log
+replay_pid*.log
+
+# Temporary and generated artifacts
+tests/tmp*/
+tmp*/
+*.tmp
+*.bak
+file_index.json
+tmp_midterm_report.pptx
+
+# Analysis outputs
+outputs/
+reports/
+*.trace.json
+raw_analyses.json
+batch_errors.json
+precondition_profile.json
+
+# Maven / symbolic experiment
+symbolic_experiment/target/
+symbolic_experiment/outputs/
+symbolic_experiment/dependency-reduced-pom.xml
+
+
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Java build products
+**/target/
+**/build/
+**/out/
+*.class
+
+# Office temporary files
+~$*.docx
+~$*.pptx
+
+# Operating-system files
+Thumbs.db
+.DS_Store

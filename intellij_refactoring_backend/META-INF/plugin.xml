@@ -1,0 +1,13 @@
+<idea-plugin>
+  <id>experiment.intellij.refactoring.backend</id>
+  <name>Refactoring Test IntelliJ Backend</name>
+  <vendor>Experiment</vendor>
+  <version>1.0.0</version>
+
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.java</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <appStarter id="ij-refactor-test" implementation="experiment.intellij.runner.IntelliJRefactoringStarter"/>
+  </extensions>
+</idea-plugin>
