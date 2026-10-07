@@ -10,6 +10,12 @@ This repository contains the executable pipeline code only. It does not
 include the precondition corpus, IDE source repositories, generated tests,
 experiment outputs, or IDE installations.
 
+## Bug List
+
+The complete list of submitted bugs is available here:
+
+[View the interactive bug list](https://engtes1.github.io/PreDiff/bug-list.html)
+
 ## Pipeline
 
 ```text
