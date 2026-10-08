@@ -219,8 +219,7 @@ python generate_tests_from_comparison.py `
 ```
 
 The output contains independent Java programs and `test_cases.json`, which
-stores each refactoring request and target. Static validation does not prove
-that a generated program will compile or that an IDE will accept the request.
+stores each refactoring request and target.
 
 Run the optional compilation and execution precheck before invoking an IDE:
 
