@@ -46,9 +46,6 @@ generate_tests_from_comparison.py
 
 ## Prerequisites
 
-See [ENVIRONMENT.md](ENVIRONMENT.md) for the verified reference environment,
-external tools, IDE compatibility notes, and a pre-run checklist.
-
 - Python 3.10 or later.
 - JDK 17 or later for precondition analysis; JDK 21 is recommended for the
   complete IDE-runner workflow.
