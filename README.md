@@ -6,7 +6,7 @@ method-level source snippets, compares the recovered preconditions across
 engines, generates discrepancy-guided Java tests, and executes the same
 refactoring requests in multiple IDEs.
 
-This repository contains the executable pipeline code only. It does not
+This repository contains the executable pipeline code. It does not
 include the precondition corpus, IDE source repositories, generated tests,
 experiment outputs, or IDE installations.
 
